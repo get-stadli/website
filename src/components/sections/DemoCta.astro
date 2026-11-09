@@ -3,7 +3,6 @@
  * "Book a demo" block: copy on the left, form card on the right.
  * The form opens a pre-filled email by default; pass `action` to post to a form handler.
  */
-import { clubs } from "../../content/clubs";
 import { site } from "../../content/site";
 
 const {
@@ -20,7 +19,6 @@ const {
   headingTag?: "h1" | "h2";
 };
 const Heading = headingTag;
-const proof = clubs.slice(0, 5);
 ---
 
 <section class="cta">
@@ -62,29 +60,22 @@ const proof = clubs.slice(0, 5);
     </form>
   </div>
 
-  <ul class="cta__proof">
-    {proof.map((club) => (
-      <li><img src={club.src} alt={club.name} loading="lazy" decoding="async" /></li>
-    ))}
-  </ul>
 </section>
 
 <style>
   .cta{
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: auto auto;
+    align-items: center;
     gap: 28px clamp(32px, 5vw, 80px);
     color: var(--dc-text);
   }
-  .cta__copy{ grid-area: 1 / 1; align-self: end; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .cta__copy{ display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
   .cta__copy .d-eyebrow{ margin-bottom: -8px; }
   .cta__heading{ max-width: 570px; }
   .cta__lede{ max-width: 440px; text-wrap: balance; }
 
   .cta__card{
-    grid-area: 1 / 2 / span 2;
-    align-self: center;
     padding: 32px;
     border-radius: var(--d-radius-media);
     background: #fff;
@@ -96,31 +87,10 @@ const proof = clubs.slice(0, 5);
   .cta__pair > .d-label{ flex: 1 1 160px; }
   .cta__form .d-btn{ font-size: 14px; }
 
-  .cta__proof{
-    grid-area: 2 / 1;
-    align-self: start;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 16px 24px;
-    margin: 12px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .cta__proof img{
-    width: auto;
-    max-width: 96px;
-    height: 48px;
-    object-fit: contain;
-    filter: grayscale(1) contrast(.6) brightness(1.5);
-    opacity: .7;
-  }
 
   @media (max-width: 900px){
-    .cta{ grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 32px; }
-    .cta__copy, .cta__card, .cta__proof{ grid-area: auto / 1; align-self: auto; }
+    .cta{ grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
     .cta__heading{ font-size: var(--d-type-display); line-height: .98; }
     .cta__card{ padding: 24px; }
-    .cta__proof{ margin-top: -8px; }
   }
 </style>
