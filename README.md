@@ -69,11 +69,26 @@ src/styles/
 - Easy to delete or replace
 - Easy to extend
 
+### Stadli design layer
+
+The visual style follows the Stadli marketing site: black page, white rounded
+"sheets" that lap over dark bands, Instrument Sans with tight display tracking.
+
+- Tokens live in `tokens.css` (`--d-*` for fixed values, `--dc-*` for values that
+  flip on black; add `.on-black` to a wrapper to switch).
+- Primitives in `structure.css`: `.d-wrap`, `.d-sheet` (+ `--lap`, `--narrow`, `--last`),
+  `.d-band`, `.d-display`, `.d-heading`, `.d-quote`, `.d-lede`, `.d-text`, `.d-btn`
+  (+ `--light`), `.d-arrow`, `.d-badge`, `.d-field`.
+- Sections in `src/components/sections/`: `Hero`, `FeatureScroll`, `CardGrid`,
+  `LogoStrip`, `DemoCta`. Inner pages use `PageTop` followed by a lapping sheet.
+- JS is small and opt-in: the header turns solid on scroll and the feature list pins
+  on wide screens. Without JS the header is solid and panels stack.
+
 ### Fonts
 
-- Fonts served from `/public/fonts`
-- Explicit @font-face
-- No external font dependency by default
+- Instrument Sans (OFL) served from `/public/fonts/InstrumentSans.woff2`
+- Explicit @font-face, preloaded in `Base.astro`
+- No external font dependency
 
 ### Configuration as data
 

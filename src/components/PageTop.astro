@@ -1,0 +1,20 @@
+---
+/**
+ * Dark title band for inner pages. Follow it with a `.d-sheet.d-sheet--lap`
+ * so the white sheet laps over its bottom edge.
+ */
+const { eyebrow, title, lede } = Astro.props as {
+  eyebrow?: string;
+  title: string;
+  lede?: string;
+};
+---
+
+<section class="page-top on-black">
+  <div class="d-wrap page-top__inner">
+    {eyebrow && <span class="d-eyebrow">{eyebrow}</span>}
+    <h1 class="d-display">{title}</h1>
+    {lede && <p class="d-lede">{lede}</p>}
+    <slot />
+  </div>
+</section>

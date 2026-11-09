@@ -1,0 +1,41 @@
+---
+import { clubs } from "../../content/clubs";
+
+const { caption, logos = clubs } = Astro.props as {
+  caption?: string;
+  logos?: { name: string; src: string; scale?: number }[];
+};
+---
+
+<section class="logo-strip">
+  {caption && <p class="logo-strip__caption">{caption}</p>}
+  <ul class="logo-strip__logos">
+    {logos.map((logo) => (
+      <li style={logo.scale ? `--logo-scale:${logo.scale}` : undefined}>
+        <img src={logo.src} alt={logo.name} loading="lazy" decoding="async" />
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .logo-strip{ display: flex; flex-direction: column; align-items: center; gap: 40px; }
+  .logo-strip__caption{ color: var(--dc-muted); font-size: 15px; font-weight: 500; text-align: center; text-wrap: balance; }
+  .logo-strip__logos{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 32px clamp(32px, 6vw, 88px);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .logo-strip__logos img{
+    width: auto;
+    max-width: none;
+    height: calc(clamp(44px, 4.9vw, 70px) * var(--logo-scale, 1));
+    object-fit: contain;
+  }
+</style>

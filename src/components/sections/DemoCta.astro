@@ -1,0 +1,126 @@
+---
+/**
+ * "Book a demo" block: copy on the left, form card on the right.
+ * The form opens a pre-filled email by default; pass `action` to post to a form handler.
+ */
+import { clubs } from "../../content/clubs";
+import { site } from "../../content/site";
+
+const {
+  eyebrow = "Book a demo",
+  heading = "Let’s put Stadli to work.",
+  lede = "Tell us about your events and what you want to achieve. We’ll show you how Stadli can help you sell more, manage operations and bring your crowd back.",
+  action,
+  headingTag = "h2"
+} = Astro.props as {
+  eyebrow?: string;
+  heading?: string;
+  lede?: string;
+  action?: string;
+  headingTag?: "h1" | "h2";
+};
+const Heading = headingTag;
+const proof = clubs.slice(0, 5);
+---
+
+<section class="cta">
+  <div class="cta__copy">
+    <span class="d-eyebrow">{eyebrow}</span>
+    <Heading class="d-heading cta__heading">{heading}</Heading>
+    <p class="d-lede cta__lede">{lede}</p>
+  </div>
+
+  <div class="cta__card">
+    <form
+      class="cta__form"
+      method="post"
+      action={action ?? `mailto:${site.author.email}`}
+      enctype={action ? undefined : "text/plain"}
+    >
+      <p class="cta__title">Let’s talk.</p>
+      <div class="cta__pair">
+        <label class="d-label">Name
+          <input class="d-field" name="name" autocomplete="name" placeholder="Your name" required />
+        </label>
+        <label class="d-label">Team
+          <input class="d-field" name="team" autocomplete="organization" placeholder="Team or venue" />
+        </label>
+      </div>
+      <label class="d-label">Work email
+        <input class="d-field" type="email" name="email" autocomplete="email" placeholder="you@team.com" required />
+      </label>
+      <label class="d-label">Organization type
+        <select class="d-field" name="type">
+          <option>Sports team</option>
+          <option>Venue</option>
+          <option>Festival or live event</option>
+          <option>League or federation</option>
+          <option>Other</option>
+        </select>
+      </label>
+      <button class="d-btn d-btn--block" type="submit">Request a demo</button>
+    </form>
+  </div>
+
+  <ul class="cta__proof">
+    {proof.map((club) => (
+      <li><img src={club.src} alt={club.name} loading="lazy" decoding="async" /></li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .cta{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 28px clamp(32px, 5vw, 80px);
+    color: var(--dc-text);
+  }
+  .cta__copy{ grid-area: 1 / 1; align-self: end; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .cta__copy .d-eyebrow{ margin-bottom: -8px; }
+  .cta__heading{ max-width: 570px; }
+  .cta__lede{ max-width: 440px; text-wrap: balance; }
+
+  .cta__card{
+    grid-area: 1 / 2 / span 2;
+    align-self: center;
+    padding: 32px;
+    border-radius: var(--d-radius-media);
+    background: #fff;
+    color: var(--d-ink);
+  }
+  .cta__form{ display: flex; flex-direction: column; gap: 20px; }
+  .cta__title{ margin-top: 8px; font-size: 20px; font-weight: 500; letter-spacing: -.025em; line-height: 1.2; }
+  .cta__pair{ display: flex; flex-wrap: wrap; gap: 16px; }
+  .cta__pair > .d-label{ flex: 1 1 160px; }
+  .cta__form .d-btn{ font-size: 14px; }
+
+  .cta__proof{
+    grid-area: 2 / 1;
+    align-self: start;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cta__proof img{
+    width: auto;
+    max-width: 96px;
+    height: 48px;
+    object-fit: contain;
+    filter: grayscale(1) contrast(.6) brightness(1.5);
+    opacity: .7;
+  }
+
+  @media (max-width: 900px){
+    .cta{ grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 32px; }
+    .cta__copy, .cta__card, .cta__proof{ grid-area: auto / 1; align-self: auto; }
+    .cta__heading{ font-size: var(--d-type-display); line-height: .98; }
+    .cta__card{ padding: 24px; }
+    .cta__proof{ margin-top: -8px; }
+  }
+</style>

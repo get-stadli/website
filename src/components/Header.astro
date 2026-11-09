@@ -1,29 +1,54 @@
 ---
 import { site, type SiteNavItem } from "../content/site";
 
-const { brand = site.name, nav = site.nav } = Astro.props as {
-  brand?: string;
+const { nav = site.nav, cta = site.cta } = Astro.props as {
   nav?: SiteNavItem[];
+  cta?: SiteNavItem;
 };
 
 const path = Astro.url.pathname;
 const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 ---
 
-<header class="header">
-  <div class="header__inner">
-    <a class="header__brand" href="/">{brand}</a>
+<header class="site-header" data-header>
+  <div class="d-wrap site-header__bar">
+    <details class="site-menu">
+      <summary aria-label="Menu"><span class="site-menu__icon" aria-hidden="true"></span></summary>
+      <div class="site-drawer">
+        <nav class="d-wrap site-drawer__list" aria-label="Mobile">
+          {nav.map((item) => (
+            <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>{item.label}</a>
+          ))}
+        </nav>
+        <div class="d-wrap">
+          <a class="d-btn d-btn--light" href={cta.href}>{cta.label}</a>
+        </div>
+      </div>
+    </details>
 
-    <nav class="header__nav" aria-label="Primary">
-      <ul class="nav">
-        {nav.map((item) => (
-          <li class="nav__item">
-            <a class={`nav__link ${isActive(item.href) ? "is-active" : ""}`} href={item.href}>
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+    <a class="site-logo" href="/" aria-label={`${site.name} home`}>
+      <img src="/images/brand/stadli-white.png" alt={site.name} width="101" height="30" />
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      {nav.map((item) => (
+        <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>{item.label}</a>
+      ))}
     </nav>
+
+    <a class="d-arrow site-demo" href={cta.href}>
+      <span class="site-demo__long">{cta.label}</span>
+      <span class="site-demo__short">Demo</span>
+    </a>
   </div>
 </header>
+
+<script>
+  // Header turns solid black once the page scrolls under it
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  if (header) {
+    const update = () => header.classList.toggle("is-stuck", window.scrollY > 8);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+  }
+</script>

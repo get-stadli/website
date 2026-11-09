@@ -1,37 +1,22 @@
 ---
 import Base from "../layouts/Base.astro";
+import DemoCta from "../components/sections/DemoCta.astro";
 import { site } from "../content/site";
 
 const title = `Contact — ${site.name}`;
 ---
 
-<Base
-  title={title}
-  description={`Contact ${site.name}`}
-  canonicalPath="/contact"
-  mainCentered
->
-  <article class="prose">
-    <h1>Contact</h1>
-
-    <p class="lead">
-      This site does not include a contact form by default.
-    </p>
-
-    <p>
-      If you need to get in touch, you can reach us by email:
-    </p>
-
-    {site.author.email && (
-      <p>
-        <a href={`mailto:${site.author.email}`}>
-          {site.author.email}
-        </a>
-      </p>
-    )}
-
-    <p>
-      This keeps the baseline simple and avoids unnecessary JavaScript.
-    </p>
-  </article>
+<Base title={title} description={`Book a demo of ${site.name}`} canonicalPath="/contact">
+  <div class="on-black contact">
+    <div class="d-wrap">
+      <DemoCta headingTag="h1" />
+    </div>
+  </div>
 </Base>
+
+<style>
+  .contact{
+    padding-top: calc(var(--d-header) + clamp(48px, 6vw, 96px));
+    padding-bottom: var(--d-section);
+  }
+</style>

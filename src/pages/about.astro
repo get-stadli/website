@@ -1,31 +1,52 @@
 ---
 import Base from "../layouts/Base.astro";
+import PageTop from "../components/PageTop.astro";
+import LogoStrip from "../components/sections/LogoStrip.astro";
+import DemoCta from "../components/sections/DemoCta.astro";
 import { site } from "../content/site";
 
 const title = `About — ${site.name}`;
 ---
 
-<Base
-  title={title}
-  description={`About ${site.name}`}
-  canonicalPath="/about"
->
-  <article class="prose">
-    <h1>About</h1>
+<Base title={title} description={`About ${site.name}`} canonicalPath="/about">
+  <PageTop
+    eyebrow="About"
+    title="Built for the people who bring people together."
+    lede={site.footer.about}
+  />
 
-    <p class="lead">
-      {site.name} is a minimal Astro baseline focused on structure, clarity, and
-      build-time decisions.
-    </p>
+  <div class="d-sheet d-sheet--lap d-sheet--narrow">
+    <div class="d-wrap">
+      <article class="prose">
+        <p>
+          <strong>{site.name} is the 360° platform for sports and live events.</strong>
+          Ticketing, fan data and marketing live in one place, so clubs and venues can
+          sell more, run game night smoothly and bring their crowd back.
+        </p>
+        <h2>Why we built it</h2>
+        <p>
+          Most teams juggle a ticketing tool, a spreadsheet of fans and a separate email
+          platform. Nothing talks to anything else. We built {site.name} so every sale
+          tells you something about your fans, and every message is based on what they
+          actually do.
+        </p>
+        <h2>Who it’s for</h2>
+        <ul>
+          <li>Professional and semi-pro sports clubs</li>
+          <li>Venues and arenas</li>
+          <li>Festivals and live events</li>
+        </ul>
+      </article>
+    </div>
+    <div class="d-sheet-corners" aria-hidden="true"></div>
+  </div>
 
-    <p>
-      This starter intentionally avoids UI kits, heavy abstractions, and runtime
-      JavaScript. It provides a solid foundation for websites that value
-      performance, accessibility, and long-term maintainability.
-    </p>
-
-    <p>
-      You are expected to adapt it, extend it, and make it your own.
-    </p>
-  </article>
+  <div class="on-black">
+    <div class="d-band">
+      <div class="d-wrap"><LogoStrip caption="Trusted by clubs across Québec and Ontario" /></div>
+    </div>
+    <div class="d-band">
+      <div class="d-wrap"><DemoCta /></div>
+    </div>
+  </div>
 </Base>
