@@ -56,8 +56,8 @@ export const site: SiteConfig = {
   nav: [
     { label: "Platform", href: "/" },
     { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
-    { label: "Legal", href: "/legal" }
+    { label: "Articles", href: "/articles" },
+    { label: "Contact", href: "/contact" }
   ],
   cta: { label: "Book a demo", href: "/contact" },
   footer: {
@@ -69,6 +69,7 @@ export const site: SiteConfig = {
         links: [
           { label: "Home", href: "/" },
           { label: "About", href: "/about" },
+          { label: "Articles", href: "/articles" },
           { label: "Contact", href: "/contact" },
           { label: "Legal", href: "/legal" }
         ]
@@ -76,8 +77,9 @@ export const site: SiteConfig = {
       {
         title: "Follow",
         links: [
-          { label: "LinkedIn", href: "https://www.linkedin.com/" },
-          { label: "Sitemap", href: "/sitemap-index.xml" }
+          { label: "Case studies", href: "/articles?type=case-study" },
+          { label: "News", href: "/articles?type=news" },
+          { label: "LinkedIn", href: "https://www.linkedin.com/" }
         ]
       }
     ],

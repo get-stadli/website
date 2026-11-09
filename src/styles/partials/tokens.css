@@ -8,6 +8,18 @@
   --d-field: #e6e6e6;
   --d-rule: #ececec;
   --d-stage: #e6e6e6;
+  --d-body: #333;
+  --d-grey: #8a8a8a;
+
+  /* Tints (badges) */
+  --d-tint-blue-bg: #dbeafe;
+  --d-tint-blue-text: #1d4ed8;
+  --d-tint-violet-bg: #ede9fe;
+  --d-tint-violet-text: #6d28d9;
+  --d-tint-indigo-bg: #e0e7ff;
+  --d-tint-indigo-text: #4338ca;
+  --d-tint-cyan-bg: #cffafe;
+  --d-tint-cyan-text: #0e7490;
 
   /* On black */
   --d-black-card: #141414;
@@ -32,6 +44,8 @@
   /* Type */
   --font-sans: "Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --d-type-title: clamp(36px, 4.9vw, 72px);
+  --d-type-feature: clamp(30px, 3.05vw, 44px);
   --d-type-display: min(64px, max(32px, 5.8vw, min(10vw, 47px)));
   --d-type-heading: clamp(30px, 3.05vw, 44px);
   --d-type-quote: clamp(26px, 2.8vw, 40px);

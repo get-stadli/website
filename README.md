@@ -118,6 +118,35 @@ Used consistently across:
 
 No duplication.
 
+## Articles (blog)
+
+Articles, case studies and news live in `src/content/articles/` as Markdown, one file
+per entry, using an Astro content collection (`src/content.config.ts`). The file name
+becomes the URL: `src/content/articles/my-post.md` → `/articles/my-post`.
+
+```
+---
+title: How the Lakeshore Mariners filled the third homestand
+excerpt: One or two sentences, shown on cards and under the title.
+type: case-study          # article | case-study | news
+date: 2026-06-15
+image: /images/articles/lakeshore-mariners-third-homestand.webp
+kicker: Lakeshore Mariners · Baseball, summer league   # optional grey line
+minutes: 9                # optional, articles only
+client:                   # optional, case studies: side panel
+  name: Lakeshore Mariners
+  results:
+    - { figure: "+38%", label: Season tickets renewed }
+  products: [Ticketing, Fan CRM]
+---
+```
+
+- `/articles` lists everything with search, type filters (`?type=news`) and pages of 6,
+  all client-side; without JS every entry shows.
+- Article pages have a photo hero, the body, the client panel for case studies and a
+  "Keep reading" row with the three latest other entries.
+- Set `draft: true` to hide an entry.
+
 ## Layout API
 
 The layout is explicit and declarative.

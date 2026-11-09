@@ -1,0 +1,234 @@
+---
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import EntryCard from "../../components/EntryCard.astro";
+import {
+  getArticles,
+  articleMeta,
+  articleTypes,
+  articleUrl,
+  typeUrl,
+  type Article
+} from "../../content/articles";
+import { site } from "../../content/site";
+
+export async function getStaticPaths() {
+  const entries = await getArticles();
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, related: entries.filter((other) => other.id !== entry.id).slice(0, 3) }
+  }));
+}
+
+const { entry, related } = Astro.props as { entry: Article; related: Article[] };
+const { Content } = await render(entry);
+const { title, excerpt, image, imageAlt, client } = entry.data;
+const type = articleTypes[entry.data.type];
+const meta = articleMeta(entry);
+const productTones = ["blue", "violet", "indigo", "cyan"];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": entry.data.type === "news" ? "NewsArticle" : "Article",
+  headline: title,
+  description: excerpt,
+  datePublished: entry.data.date.toISOString(),
+  image: new URL(image, site.url).toString(),
+  publisher: { "@type": "Organization", name: site.name, url: site.url }
+};
+---
+
+<Base
+  title={`${title} — ${site.name}`}
+  description={excerpt}
+  canonicalPath={articleUrl(entry)}
+  ogImage={image}
+  jsonLd={jsonLd}
+>
+  <article>
+    <header class="entry-hero">
+      <img class="entry-hero__image" src={image} alt={imageAlt} width="1600" height="1200" />
+      <div class="d-wrap entry-hero__body">
+        <nav class="d-crumbs" aria-label="Breadcrumb">
+          <a href="/articles">Articles</a>
+          <span aria-hidden="true">/</span>
+          <a href={typeUrl(entry.data.type)} aria-current="page">{type.plural}</a>
+        </nav>
+        <h1 class="entry-hero__title">{title}</h1>
+        <p class="d-lede entry-hero__excerpt">{excerpt}</p>
+        <div class="entry-hero__meta">
+          <span class={`d-badge d-badge--small d-badge--${type.tone}`}>{type.label}</span>
+          {meta && <span>{meta}</span>}
+        </div>
+      </div>
+    </header>
+
+    <div class="d-sheet d-sheet--lap">
+      <div class={`d-wrap entry-columns ${client ? "entry-columns--panel" : ""}`}>
+        <div class="d-prose entry-body">
+          <Content />
+        </div>
+
+        {client && (
+          <aside class="entry-panel" aria-label={`About ${client.name}`}>
+            <div class="entry-panel__group">
+              <p class="entry-panel__team">{client.name}</p>
+              <dl class="entry-panel__facts">
+                {client.about && <div><dt>About</dt><dd>{client.about}</dd></div>}
+                {client.sport && <div><dt>Sport and league</dt><dd>{client.sport}</dd></div>}
+                {client.location && <div><dt>Location</dt><dd>{client.location}</dd></div>}
+                {client.venue && <div><dt>Venue</dt><dd>{client.venue}</dd></div>}
+                {client.website && (
+                  <div>
+                    <dt>Website</dt>
+                    <dd><a href={client.website} rel="noopener">{new URL(client.website).hostname.replace(/^www\./, "")}</a></dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+
+            {client.results.length > 0 && (
+              <div class="entry-panel__group">
+                <h2 class="entry-panel__title">Results</h2>
+                <dl class="entry-panel__results">
+                  {client.results.map((result) => (
+                    <div>
+                      <dt class="entry-panel__figure">{result.figure}</dt>
+                      <dd class="entry-panel__label">{result.label}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
+            {client.products.length > 0 && (
+              <div class="entry-panel__group entry-panel__group--products">
+                <h2 class="entry-panel__title">On {site.name}</h2>
+                <ul class="entry-panel__products">
+                  {client.products.map((product, i) => (
+                    <li class={`d-badge d-badge--small d-badge--${productTones[i % productTones.length]}`}>{product}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </aside>
+        )}
+      </div>
+      <div class="d-sheet-corners" aria-hidden="true"></div>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="keep-reading on-black">
+      <div class="d-wrap keep-reading__inner">
+        <div class="d-row-head">
+          <h2 class="keep-reading__title">Keep reading</h2>
+          <a class="d-arrow" href={typeUrl(entry.data.type)}>See all {type.plural.toLowerCase()}</a>
+        </div>
+        <div class="keep-reading__grid">
+          {related.map((other) => <EntryCard entry={other} variant="dark" headingLevel={3} />)}
+        </div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .entry-hero{
+    position: relative;
+    display: flex;
+    min-height: clamp(520px, 52vw, 760px);
+    overflow: hidden;
+    background: var(--d-black);
+    color: #fff;
+  }
+  .entry-hero::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, #02020266 0%, #0202025c 58%, var(--d-black) 100%);
+  }
+  .entry-hero__image{ position: absolute; inset: 0; width: 100%; max-width: none; height: 100%; object-fit: cover; }
+  .entry-hero__body{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding-top: clamp(172px, 15.3vw, 220px);
+    padding-bottom: calc(var(--d-sheet-lap) + clamp(64px, 8vw, 120px));
+  }
+  .entry-hero__title{
+    max-width: 980px;
+    font-size: var(--d-type-title);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: var(--d-track-display);
+    text-wrap: balance;
+  }
+  .entry-hero__excerpt{ max-width: 640px; color: #ffffffd9; }
+  .entry-hero__meta{ display: flex; flex-wrap: wrap; align-items: center; gap: 12px; color: #ffffffbf; font-size: 14px; }
+
+  .entry-columns{ display: flex; flex-wrap: wrap; align-items: flex-start; gap: 48px clamp(32px, 6vw, 96px); }
+  .entry-body{ flex: 1 1 520px; min-width: 0; max-width: 680px; }
+  .entry-columns:not(.entry-columns--panel) .entry-body{ margin-inline: auto; }
+  .entry-body > :global(p:first-child){
+    margin-bottom: 8px;
+    color: var(--d-ink);
+    font-size: clamp(19px, 1.6vw, 23px);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -.02em;
+  }
+
+  .entry-panel{
+    position: sticky;
+    top: calc(var(--d-header) + 32px);
+    flex: 0 1 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+    margin-left: auto;
+    padding: 28px;
+    border-radius: var(--d-radius-card);
+    background: var(--d-inset);
+  }
+  .entry-panel__group{ display: flex; flex-direction: column; gap: 20px; }
+  .entry-panel__group + .entry-panel__group{ padding-top: 24px; border-top: 1px solid #e2e2e2; }
+  .entry-panel__group--products{ gap: 12px; }
+  .entry-panel__team{ font-size: 20px; font-weight: 500; line-height: 1.2; letter-spacing: -.03em; }
+  .entry-panel__facts,
+  .entry-panel__results{ display: flex; flex-direction: column; gap: 16px; margin: 0; }
+  .entry-panel__results{ gap: 20px; }
+  .entry-panel__facts dt{ margin: 0 0 4px; color: var(--d-muted); font-size: 13px; line-height: 1.4; }
+  .entry-panel__facts dd{ margin: 0; color: var(--d-ink); font-size: 14px; font-weight: 500; line-height: 1.45; }
+  .entry-panel__facts a{ color: var(--d-ink); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .entry-panel__title{ font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .entry-panel__results > div{ display: flex; flex-direction: column; gap: 4px; }
+  .entry-panel__figure{ font-size: clamp(32px, 2.8vw, 40px); font-weight: 500; line-height: 1; letter-spacing: -.045em; }
+  .entry-panel__label{ margin: 0; color: var(--d-muted); font-size: 14px; line-height: 1.4; }
+  .entry-panel__products{ display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+  .keep-reading__inner{
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding-top: var(--d-section);
+    padding-bottom: calc(var(--d-section) * .5);
+    color: #fff;
+  }
+  .keep-reading__title{ font-size: var(--d-type-feature); font-weight: 500; line-height: 1.04; letter-spacing: var(--d-track-heading); }
+  .keep-reading__grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+
+  @media (max-width: 900px){
+    .entry-panel{ position: static; flex-basis: 100%; margin-left: 0; }
+  }
+  @media (max-width: 1000px){
+    .keep-reading__grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px){
+    .keep-reading__grid{ grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

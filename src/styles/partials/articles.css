@@ -1,0 +1,134 @@
+/* ------------------------------------------------------------------
+   Badges, crumbs, helpers
+------------------------------------------------------------------ */
+.d-badge--small{ padding: 4px 9px; font-size: 12.5px; }
+.d-badge--neutral{ background: var(--dc-tag); color: var(--dc-tag-text); }
+.d-badge--blue{ background: var(--d-tint-blue-bg); color: var(--d-tint-blue-text); }
+.d-badge--violet{ background: var(--d-tint-violet-bg); color: var(--d-tint-violet-text); }
+.d-badge--indigo{ background: var(--d-tint-indigo-bg); color: var(--d-tint-indigo-text); }
+.d-badge--cyan{ background: var(--d-tint-cyan-bg); color: var(--d-tint-cyan-text); }
+
+.d-clamp2{
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.d-row-head{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.d-crumbs{ display: flex; flex-wrap: wrap; gap: 8px; color: #ffffffbf; font-size: 14px; }
+.d-crumbs a{ color: #ffffffbf; text-decoration: none; }
+.d-crumbs a:hover,
+.d-crumbs a:last-child,
+.d-crumbs [aria-current]{ color: #fff; }
+
+.d-visually-hidden{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Entry card
+------------------------------------------------------------------ */
+.entry-card{ min-width: 0; }
+.entry-card[hidden]{ display: none; }
+.entry-card__link{
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  height: 100%;
+  color: var(--d-ink);
+  text-decoration: none;
+}
+.entry-card__image{
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--d-radius-media);
+  background: var(--d-inset);
+}
+.entry-card__image img{ width: 100%; max-width: none; height: 100%; object-fit: cover; }
+.entry-card__body{ display: flex; flex-direction: column; gap: 10px; }
+.entry-card__meta{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--d-muted); font-size: 13px; }
+.entry-card__title{
+  max-width: 17em;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  text-wrap: balance;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.entry-card__link:hover .entry-card__title{ text-decoration-line: underline; }
+.entry-card__excerpt{ color: var(--d-muted); font-size: var(--d-type-small); line-height: 1.5; }
+
+.entry-card--dark .entry-card__link{
+  padding: 12px 12px 24px;
+  border-radius: var(--d-radius-card);
+  background: var(--d-black-card);
+  color: #fff;
+}
+.entry-card--dark .entry-card__image{ border-radius: 10px; background: var(--d-black-tag); }
+.entry-card--dark .entry-card__body{ padding: 0 12px; }
+.entry-card--dark :is(.entry-card__meta, .entry-card__excerpt){ color: var(--d-black-muted); }
+
+/* ------------------------------------------------------------------
+   Long-form body
+------------------------------------------------------------------ */
+.d-prose{
+  color: var(--d-body);
+  font-size: clamp(16px, 1.25vw, 18px);
+  line-height: 1.65;
+}
+.d-prose p{ margin: 0 0 20px; }
+.d-prose h2{
+  margin: 40px 0 16px;
+  color: var(--d-ink);
+  font-size: clamp(26px, 2.2vw, 32px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: var(--d-track-heading);
+}
+.d-prose h3{
+  margin: 40px 0 12px;
+  color: var(--d-ink);
+  font-size: clamp(19px, 1.55vw, 22px);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -.03em;
+}
+.d-prose > :first-child{ margin-top: 0; }
+.d-prose > :last-child{ margin-bottom: 0; }
+.d-prose :is(ul, ol){ margin: 0 0 20px; padding-left: 22px; }
+.d-prose li{ margin: 0 0 8px; padding-left: 4px; line-height: 1.6; }
+.d-prose li::marker{ color: var(--d-grey); }
+.d-prose blockquote{
+  margin: 36px 0;
+  padding: 2px 0 2px 24px;
+  border-left: 2px solid var(--d-ink);
+  color: var(--d-ink);
+  font-size: clamp(21px, 1.95vw, 28px);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -.03em;
+  text-wrap: pretty;
+}
+.d-prose blockquote p{ margin: 0; }
+.d-prose a{ color: var(--d-ink); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.d-prose img{ border-radius: var(--d-radius-media); }
+.d-prose strong{ color: var(--d-ink); font-weight: 500; }
+
+@media (max-width: 640px){
+  .d-prose blockquote{ margin: 28px 0; padding-left: 18px; }
+}
