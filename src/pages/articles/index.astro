@@ -1,0 +1,288 @@
+---
+import Base from "../../layouts/Base.astro";
+import EntryCard from "../../components/EntryCard.astro";
+import { getArticles, articleTypes, type ArticleType } from "../../content/articles";
+import { site } from "../../content/site";
+
+const entries = await getArticles();
+const counts = Object.fromEntries(
+  (Object.keys(articleTypes) as ArticleType[]).map((type) => [
+    type,
+    entries.filter((entry) => entry.data.type === type).length
+  ])
+) as Record<ArticleType, number>;
+
+// Chip order follows the reference: All, Articles, Case studies, News
+const chips = [
+  { type: "", label: "All", count: entries.length },
+  ...(["article", "case-study", "news"] as ArticleType[])
+    .filter((type) => counts[type] > 0)
+    .map((type) => ({ type, label: articleTypes[type].plural, count: counts[type] }))
+];
+
+const PAGE_SIZE = 6;
+const title = `Articles — ${site.name}`;
+const lede = "Articles, case studies and news for the people who fill the stands.";
+---
+
+<Base title={title} description={lede} canonicalPath="/articles">
+  <header class="d-wrap articles-top on-black">
+    <h1 class="d-display">Articles</h1>
+    <p class="d-lede">{lede}</p>
+
+    <form class="article-search" role="search" action="/articles" data-article-search>
+      <label class="d-visually-hidden" for="article-search-input">Search articles and case studies</label>
+      <svg class="article-search__icon" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="8.5" cy="8.5" r="5.5"></circle>
+        <path d="M13 13l4 4"></path>
+      </svg>
+      <input
+        id="article-search-input"
+        class="article-search__input"
+        type="search"
+        name="q"
+        placeholder="Search articles"
+        autocomplete="off"
+      />
+    </form>
+
+    <nav class="article-filters" aria-label="Filter articles">
+      {chips.map((chip, i) => (
+        <a
+          class="article-chip"
+          href={chip.type ? `/articles?type=${chip.type}` : "/articles"}
+          data-filter={chip.type}
+          aria-current={i === 0 ? "true" : undefined}
+        >
+          {chip.label}<span>{chip.count}</span>
+        </a>
+      ))}
+    </nav>
+  </header>
+
+  <div class="d-sheet d-sheet--last articles-sheet">
+    <div class="d-wrap articles-sheet__inner">
+      <div class="articles-grid" data-article-grid data-page-size={PAGE_SIZE}>
+        {entries.map((entry) => <EntryCard entry={entry} />)}
+      </div>
+
+      <p class="articles-empty" data-article-empty hidden>
+        No results. <a href="/articles" data-filter="">Show everything</a>
+      </p>
+
+      <nav class="articles-pages" aria-label="Pages" data-article-pages hidden></nav>
+    </div>
+    <div class="d-sheet-corners" aria-hidden="true"></div>
+  </div>
+</Base>
+
+<script>
+  // Filter chips, search and pages, all client-side. Without JS every entry shows.
+  const grid = document.querySelector<HTMLElement>("[data-article-grid]");
+  const form = document.querySelector<HTMLFormElement>("[data-article-search]");
+  const input = form?.querySelector<HTMLInputElement>("input");
+  const empty = document.querySelector<HTMLElement>("[data-article-empty]");
+  const pager = document.querySelector<HTMLElement>("[data-article-pages]");
+  const chips = [...document.querySelectorAll<HTMLAnchorElement>(".article-chip")];
+
+  if (grid && input && empty && pager) {
+    const cards = [...grid.querySelectorAll<HTMLElement>("[data-entry]")];
+    const pageSize = Number(grid.dataset.pageSize) || 6;
+    const params = new URLSearchParams(location.search);
+    const state = {
+      type: params.get("type") ?? "",
+      q: params.get("q") ?? "",
+      page: Math.max(1, Number(params.get("page")) || 1)
+    };
+    input.value = state.q;
+
+    const syncUrl = () => {
+      const next = new URLSearchParams();
+      if (state.type) next.set("type", state.type);
+      if (state.q) next.set("q", state.q);
+      if (state.page > 1) next.set("page", String(state.page));
+      const query = next.toString();
+      history.replaceState(null, "", query ? `?${query}` : location.pathname);
+    };
+
+    const pageLink = (label: string, page: number, className: string, current = false) => {
+      const link = document.createElement("a");
+      link.className = className;
+      link.href = `?page=${page}`;
+      link.textContent = label;
+      if (current) link.setAttribute("aria-current", "page");
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        state.page = page;
+        render();
+        grid.scrollIntoView({ block: "start" });
+      });
+      return link;
+    };
+
+    const render = () => {
+      const terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+      const matches = cards.filter((card) => {
+        const typeOk = !state.type || card.dataset.type === state.type;
+        const text = card.dataset.search ?? "";
+        return typeOk && terms.every((term) => text.includes(term));
+      });
+
+      const pages = Math.max(1, Math.ceil(matches.length / pageSize));
+      state.page = Math.min(state.page, pages);
+      const start = (state.page - 1) * pageSize;
+      const visible = new Set(matches.slice(start, start + pageSize));
+      cards.forEach((card) => (card.hidden = !visible.has(card)));
+
+      empty.hidden = matches.length > 0;
+      chips.forEach((chip) => {
+        if ((chip.dataset.filter ?? "") === state.type) chip.setAttribute("aria-current", "true");
+        else chip.removeAttribute("aria-current");
+      });
+
+      pager.replaceChildren();
+      pager.hidden = pages < 2;
+      if (pages > 1) {
+        if (state.page > 1) pager.append(pageLink("Previous", state.page - 1, "articles-pages__step articles-pages__step--prev"));
+        for (let n = 1; n <= pages; n++) pager.append(pageLink(String(n), n, "articles-pages__number", n === state.page));
+        if (state.page < pages) pager.append(pageLink("Next", state.page + 1, "articles-pages__step d-arrow"));
+      }
+      syncUrl();
+    };
+
+    document.querySelectorAll<HTMLAnchorElement>("a[data-filter]").forEach((link) =>
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        state.type = link.dataset.filter ?? "";
+        state.page = 1;
+        if (!link.classList.contains("article-chip")) {
+          state.q = "";
+          input.value = "";
+        }
+        render();
+      })
+    );
+    input.addEventListener("input", () => {
+      state.q = input.value.trim();
+      state.page = 1;
+      render();
+    });
+    form?.addEventListener("submit", (event) => event.preventDefault());
+
+    render();
+  }
+</script>
+
+<style>
+  .articles-top{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding-top: clamp(150px, 13vw, 196px);
+    padding-bottom: clamp(56px, 6vw, 88px);
+    color: #fff;
+  }
+  .articles-top .d-lede{ max-width: 20em; color: var(--d-black-muted); text-wrap: balance; }
+
+  .article-search{ position: relative; width: min(480px, 100%); margin-top: 12px; }
+  .article-search__icon{
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    translate: 0 -50%;
+    fill: none;
+    stroke: var(--d-black-muted);
+    stroke-width: 1.6px;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+  .article-search__input{
+    width: 100%;
+    height: 44px;
+    padding: 0 14px 0 42px;
+    border: 1px solid var(--d-black-edge);
+    border-radius: 8px;
+    background: var(--d-black-card);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+  }
+  .article-search__input::placeholder{ color: var(--d-grey); opacity: 1; }
+  .article-search__input:focus-visible{ border-color: #fff; }
+  .article-search__input::-webkit-search-cancel-button{ appearance: none; }
+
+  .article-filters{ display: flex; flex-wrap: wrap; gap: 8px; max-width: 100%; }
+  .article-chip{
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid var(--d-black-edge);
+    border-radius: 7px;
+    background: var(--d-black-card);
+    color: var(--d-black-soft);
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .article-chip:hover{ border-color: var(--d-muted); }
+  .article-chip span{ color: var(--d-grey); }
+  .article-chip[aria-current="true"]{ border-color: #fff; background: #fff; color: var(--d-ink); }
+  .article-chip[aria-current="true"] span{ color: var(--d-muted); }
+
+  .articles-sheet{ padding-top: calc(var(--d-section) * .6); }
+  .articles-sheet__inner{ display: flex; flex-direction: column; gap: clamp(48px, 4.4vw, 64px); }
+  .articles-grid{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(48px, 4.45vw, 64px) 24px;
+  }
+  .articles-empty{ color: var(--d-muted); text-align: center; }
+  .articles-empty a{ color: var(--d-ink); text-underline-offset: 3px; }
+
+  .articles-pages{ display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; }
+  .articles-pages[hidden]{ display: none; }
+  .articles-pages :global(.articles-pages__number){
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 6px;
+    border-radius: 7px;
+    background: var(--d-inset);
+    color: var(--d-ink);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .articles-pages :global(.articles-pages__number:hover){ background: var(--d-field); }
+  .articles-pages :global(.articles-pages__number[aria-current="page"]){ background: var(--d-ink); color: #fff; }
+  .articles-pages :global(.articles-pages__step){
+    margin-inline: 16px;
+    color: var(--d-ink);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  @media (max-width: 1000px){
+    .articles-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px){
+    .articles-grid{ grid-template-columns: minmax(0, 1fr); }
+    .article-filters{
+      flex-wrap: nowrap;
+      align-self: stretch;
+      margin-inline: calc(-1 * var(--d-gutter));
+      padding-inline: var(--d-gutter);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+  }
+</style>

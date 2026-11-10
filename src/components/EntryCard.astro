@@ -1,0 +1,37 @@
+---
+/**
+ * Card for an article, case study or news item.
+ * variant "list" sits on the white sheet; "dark" is a tile on black.
+ */
+import { articleMeta, articleTypes, articleUrl, type Article } from "../content/articles";
+
+const { entry, variant = "list", headingLevel = 2 } = Astro.props as {
+  entry: Article;
+  variant?: "list" | "dark";
+  headingLevel?: 2 | 3;
+};
+const type = articleTypes[entry.data.type];
+const Heading = `h${headingLevel}` as "h2" | "h3";
+const search = `${entry.data.title} ${entry.data.excerpt} ${entry.data.kicker ?? ""}`.toLowerCase();
+---
+
+<article
+  class={`entry-card entry-card--${variant}`}
+  data-entry
+  data-type={entry.data.type}
+  data-search={search}
+>
+  <a class="entry-card__link" href={articleUrl(entry)}>
+    <div class="entry-card__image">
+      <img src={entry.data.image} alt={entry.data.imageAlt} loading="lazy" decoding="async" width="800" height="600" />
+    </div>
+    <div class="entry-card__body">
+      <div class="entry-card__meta">
+        <span class={`d-badge d-badge--small d-badge--${type.tone}`}>{type.label}</span>
+        <span>{articleMeta(entry)}</span>
+      </div>
+      <Heading class="entry-card__title">{entry.data.title}</Heading>
+      <p class="entry-card__excerpt d-clamp2">{entry.data.excerpt}</p>
+    </div>
+  </a>
+</article>

@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "website",
+  "compatibility_date": "2026-11-09",
+  "observability": {
+    "enabled": true
+  },
+  // Static Astro build: serve dist/ as assets, with the built 404 page
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

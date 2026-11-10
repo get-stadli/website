@@ -1,0 +1,211 @@
+---
+/**
+ * Section lead + sticky feature list. The left column stays pinned while
+ * panels scroll past; the active panel's title and copy light up.
+ * Without JS the panels simply stack, each with its own copy.
+ */
+import ProductMock from "./ProductMock.astro";
+import type { MockKind } from "./mocks";
+
+type Item = {
+  title: string;
+  text: string;
+  link?: { label: string; href: string };
+  mock: MockKind;
+};
+
+const { badge, heading, headingGrey, lede, items } = Astro.props as {
+  badge?: string;
+  heading?: string;
+  headingGrey?: string;
+  lede?: string;
+  items: Item[];
+};
+
+const total = String(items.length).padStart(2, "0");
+const count = (i: number) => `${String(i + 1).padStart(2, "0")} / ${total}`;
+---
+
+<section class="fscroll" data-fscroll>
+  {heading && (
+  <div class="fscroll__lead">
+    {badge && <span class="d-badge">{badge}</span>}
+    <h2 class="d-quote fscroll__heading">
+      {heading}
+      {headingGrey && <><br /><span class="d-grey">{headingGrey}</span></>}
+    </h2>
+    {lede && <p class="d-text">{lede}</p>}
+  </div>
+  )}
+
+  <div class="fscroll__body">
+    <div class="fscroll__side" aria-hidden="true">
+      <p class="fscroll__count" data-fscroll-count>{count(0)}</p>
+      <ol class="fscroll__list">
+        {items.map((item, i) => (
+          <li class={i === 0 ? "is-active" : ""}>
+            <button class="fscroll__name" type="button" tabindex="-1" data-fscroll-go={i}>{item.title}</button>
+          </li>
+        ))}
+      </ol>
+      <div class="fscroll__copies">
+        {items.map((item, i) => (
+          <div class={`fscroll__copy ${i === 0 ? "is-active" : ""}`}>
+            <p class="d-text">{item.text}</p>
+            {item.link && <a class="d-arrow" href={item.link.href} tabindex="-1">{item.link.label}</a>}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <ol class="fscroll__panels">
+      {items.map((item, i) => (
+        <li class={`fscroll__panel ${i === 0 ? "is-active" : ""}`} data-fscroll-panel>
+          <div class="fscroll__mob">
+            <p class="fscroll__count">{count(i)}</p>
+            <h3 class="fscroll__title">{item.title}</h3>
+            <p class="d-text">{item.text}</p>
+            {item.link && <a class="d-arrow" href={item.link.href}>{item.link.label}</a>}
+          </div>
+          <figure class="fscroll__stage"><ProductMock kind={item.mock} /></figure>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<script>
+  const isWide = window.matchMedia("(min-width: 901px)");
+
+  document.querySelectorAll<HTMLElement>("[data-fscroll]").forEach((root) => {
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-fscroll-panel]")];
+    const names = [...root.querySelectorAll<HTMLElement>(".fscroll__list > li")];
+    const copies = [...root.querySelectorAll<HTMLElement>(".fscroll__copy")];
+    const counter = root.querySelector<HTMLElement>("[data-fscroll-count]");
+    const total = String(panels.length).padStart(2, "0");
+
+    const activate = (index: number) => {
+      [panels, names, copies].forEach((list) =>
+        list.forEach((el, i) => el.classList.toggle("is-active", i === index))
+      );
+      if (counter) counter.textContent = `${String(index + 1).padStart(2, "0")} / ${total}`;
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) activate(panels.indexOf(entry.target as HTMLElement));
+        });
+      },
+      { rootMargin: "-50% 0px -50% 0px" }
+    );
+    panels.forEach((panel) => observer.observe(panel));
+
+    root.querySelectorAll<HTMLElement>("[data-fscroll-go]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const panel = panels[Number(button.dataset.fscrollGo)];
+        if (!panel || !isWide.matches) return;
+        const top = panel.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: top - (window.innerHeight - panel.offsetHeight) / 2 });
+      });
+    });
+  });
+</script>
+
+<style>
+  .fscroll{ --fs-view: min(max(calc(100svh - var(--d-header)), 560px), 960px); }
+
+  .fscroll__lead{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+  .fscroll__heading{ max-width: 16em; }
+  .fscroll__lead .d-text{ max-width: 34em; }
+
+  .fscroll__count{ font-size: 12.5px; color: var(--dc-muted); font-variant-numeric: tabular-nums; }
+  .fscroll__title{ font-size: 16px; font-weight: 500; letter-spacing: -.02em; line-height: 1.25; }
+
+  .fscroll__body{ display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .fscroll__side{ display: none; }
+
+  .fscroll__panels{ display: flex; flex-direction: column; gap: 56px; margin: 0; padding: 0; list-style: none; }
+  .fscroll__panel{ display: flex; flex-direction: column; gap: 20px; }
+  .fscroll__mob{ display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+
+  .fscroll__stage{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    margin: 0;
+    overflow: hidden;
+    border-radius: var(--d-radius-media);
+    background: var(--d-stage);
+  }
+
+  /* Pinned layout on wide screens, once JS can drive it */
+  @media (min-width: 901px){
+    :global(.js) .fscroll__body{
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: 80px;
+    }
+    :global(.js) .fscroll__side{
+      position: sticky;
+      top: var(--d-header);
+      height: var(--fs-view);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+    :global(.js) .fscroll__mob{ display: none; }
+    :global(.js) .fscroll__panels{ gap: 0; }
+    :global(.js) .fscroll__panel{
+      height: var(--fs-view);
+      display: grid;
+      place-items: center;
+      transition: opacity var(--d-duration) var(--d-ease), filter var(--d-duration) var(--d-ease), scale var(--d-duration) var(--d-ease);
+    }
+    :global(.js) .fscroll__panel:not(.is-active){ opacity: .22; filter: blur(8px) saturate(.5); scale: .95; }
+    :global(.js) .fscroll__stage{ width: min(100%, calc(var(--fs-view) - 80px)); }
+  }
+
+  .fscroll__list{ display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .fscroll__name{
+    display: block;
+    width: 100%;
+    padding: 2px 0;
+    border: 0;
+    background: none;
+    color: var(--d-ink);
+    font-size: clamp(24px, 2.3vw, 34px);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: var(--d-track-heading);
+    text-align: left;
+    cursor: pointer;
+    opacity: .22;
+    filter: blur(1.5px);
+    transition: opacity var(--d-duration) var(--d-ease), filter var(--d-duration) var(--d-ease);
+  }
+  .fscroll__name:hover{ opacity: .5; filter: none; }
+  .is-active > .fscroll__name{ opacity: 1; filter: none; }
+
+  .fscroll__copies{ display: grid; margin-top: 8px; }
+  .fscroll__copy{
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    opacity: 0;
+    filter: blur(6px);
+    translate: 0 8px;
+    pointer-events: none;
+    transition: opacity var(--d-duration) var(--d-ease), filter var(--d-duration) var(--d-ease), translate var(--d-duration) var(--d-ease);
+  }
+  .fscroll__copy.is-active{ opacity: 1; filter: none; translate: none; pointer-events: auto; }
+  .fscroll__copy .d-text{ max-width: 30em; }
+</style>

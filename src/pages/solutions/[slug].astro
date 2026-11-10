@@ -1,0 +1,42 @@
+---
+import Base from "../../layouts/Base.astro";
+import Hero from "../../components/sections/Hero.astro";
+import LogoStrip from "../../components/sections/LogoStrip.astro";
+import FeatureOverview from "../../components/sections/FeatureOverview.astro";
+import DemoCta from "../../components/sections/DemoCta.astro";
+import { solutionPages, type SolutionPage } from "../../content/solutions";
+import { site } from "../../content/site";
+
+export function getStaticPaths() {
+  return solutionPages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: SolutionPage };
+---
+
+<Base title={`${page.name} — ${site.name}`} description={page.summary} canonicalPath={`/solutions/${page.slug}`}>
+  <Hero
+    title={page.name}
+    lede={page.lede}
+    image={page.image}
+    primary={{ label: site.cta.label, href: "#demo" }}
+  />
+
+  <div class="d-sheet d-sheet--lap">
+    <div class="d-wrap solution-stack">
+      <LogoStrip caption="Trusted by teams across North America" />
+      <FeatureOverview columns={page.columns} />
+    </div>
+    <div class="d-sheet-corners" aria-hidden="true"></div>
+  </div>
+
+  <div class="on-black">
+    <div class="d-band" id="demo">
+      <div class="d-wrap"><DemoCta /></div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .solution-stack{ display: flex; flex-direction: column; gap: calc(var(--d-section) * .75); }
+</style>

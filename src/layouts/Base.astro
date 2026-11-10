@@ -14,8 +14,7 @@ const {
   canonicalPath = Astro.url.pathname,
   ogImage = site.seo.ogImage,
   robots = site.seo.robots,
-  jsonLd,
-  mainCentered = false
+  jsonLd
 } = Astro.props;
 const CF_TOKEN = "XXX";
 const canonical = new URL(canonicalPath, site.url).toString();
@@ -26,7 +25,8 @@ const canonical = new URL(canonicalPath, site.url).toString();
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content={site.seo.themeColor} />
+    <script is:inline>document.documentElement.classList.add("js");</script>
+    <link rel="preload" href="/fonts/InstrumentSans.woff2" as="font" type="font/woff2" crossorigin />
 
     <SEO
       title={title}
@@ -35,6 +35,7 @@ const canonical = new URL(canonicalPath, site.url).toString();
       ogImage={ogImage}
       robots={robots}
       jsonLd={jsonLd}
+      themeColor={site.seo.themeColor}
     />
     <Cloudfare token={CF_TOKEN} />
   </head>
@@ -42,7 +43,7 @@ const canonical = new URL(canonicalPath, site.url).toString();
   <body class="page">
     <SkipLink />
     <Header />
-    <main id="main" class={`page__main ${mainCentered ? "page__main--centered" : ""}`}>
+    <main id="main" class="page__main" tabindex="-1">
       <slot />
     </main>
     <Footer />

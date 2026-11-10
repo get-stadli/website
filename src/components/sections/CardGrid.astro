@@ -1,0 +1,79 @@
+---
+type Card = {
+  image: string;
+  alt?: string;
+  title: string;
+  text: string;
+  link?: { label: string; href: string };
+};
+
+const { heading, lede, cards, stacked = false } = Astro.props as {
+  /** Title on its own line above the text, instead of run-in */
+  stacked?: boolean;
+  heading?: string;
+  lede?: string;
+  cards: Card[];
+};
+---
+
+<section class={`card-grid ${stacked ? "card-grid--stacked" : ""}`}>
+  {heading && (
+    <div class="card-grid__head">
+      <h2 class="d-heading">{heading}</h2>
+      {lede && <p class="d-lede">{lede}</p>}
+    </div>
+  )}
+
+  <ul class="card-grid__cards" style={`--columns:${cards.length}`}>
+    {cards.map((card) => (
+      <li class="card-grid__card">
+        <div class="card-grid__photo">
+          <img src={card.image} alt={card.alt ?? ""} loading="lazy" decoding="async" width="800" height="600" />
+        </div>
+        <div class="card-grid__body">
+          <p class="card-grid__words">
+            <strong>{card.title}</strong> {card.text}
+          </p>
+          {card.link && <a class="d-arrow d-arrow--small" href={card.link.href}>{card.link.label}</a>}
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .card-grid{ display: flex; flex-direction: column; gap: clamp(40px, 4.4vw, 64px); color: var(--dc-text); }
+  .card-grid__head{ display: flex; flex-direction: column; gap: 16px; }
+  .card-grid__head .d-lede{ max-width: 680px; text-wrap: balance; }
+
+  .card-grid__cards{
+    display: grid;
+    grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card-grid__card{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 12px 12px 24px;
+    border-radius: var(--d-radius-card);
+    background: var(--dc-tile);
+  }
+  .card-grid__photo{ aspect-ratio: 4 / 3; overflow: hidden; border-radius: 10px; background: var(--dc-tile-media); }
+  .card-grid__photo img{ width: 100%; max-width: none; height: 100%; object-fit: cover; }
+  .card-grid__body{ display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding: 0 12px; }
+  .card-grid__words{ color: var(--dc-muted); font-size: clamp(15px, 1.15vw, 16px); line-height: 1.5; text-wrap: pretty; }
+  .card-grid__words strong{ color: var(--dc-text); font-weight: 500; }
+  .card-grid--stacked .card-grid__words strong{ display: block; margin-bottom: 6px; font-size: clamp(18px, 1.45vw, 21px); line-height: 1.25; letter-spacing: -.025em; }
+  .card-grid__body .d-arrow{ color: var(--dc-text); }
+
+  @media (max-width: 1000px){
+    .card-grid__cards{ grid-template-columns: repeat(min(var(--columns), 2), minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px){
+    .card-grid__cards{ grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

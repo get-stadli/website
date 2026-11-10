@@ -69,11 +69,26 @@ src/styles/
 - Easy to delete or replace
 - Easy to extend
 
+### Stadli design layer
+
+The visual style follows the Stadli marketing site: black page, white rounded
+"sheets" that lap over dark bands, Instrument Sans with tight display tracking.
+
+- Tokens live in `tokens.css` (`--d-*` for fixed values, `--dc-*` for values that
+  flip on black; add `.on-black` to a wrapper to switch).
+- Primitives in `structure.css`: `.d-wrap`, `.d-sheet` (+ `--lap`, `--narrow`, `--last`),
+  `.d-band`, `.d-display`, `.d-heading`, `.d-quote`, `.d-lede`, `.d-text`, `.d-btn`
+  (+ `--light`), `.d-arrow`, `.d-badge`, `.d-field`.
+- Sections in `src/components/sections/`: `Hero`, `FeatureScroll`, `CardGrid`,
+  `LogoStrip`, `DemoCta`. Inner pages use `PageTop` followed by a lapping sheet.
+- JS is small and opt-in: the header turns solid on scroll and the feature list pins
+  on wide screens. Without JS the header is solid and panels stack.
+
 ### Fonts
 
-- Fonts served from `/public/fonts`
-- Explicit @font-face
-- No external font dependency by default
+- Instrument Sans (OFL) served from `/public/fonts/InstrumentSans.woff2`
+- Explicit @font-face, preloaded in `Base.astro`
+- No external font dependency
 
 ### Configuration as data
 
@@ -102,6 +117,45 @@ Used consistently across:
 - JSON-LD
 
 No duplication.
+
+## Marketing pages
+
+- `/` homepage, `/platform/<slug>` (Ticketing & Commerce, Fan CRM, Marketing Tools,
+  Intelligence & AI) and `/solutions/<slug>` (Sport Teams, Live Events).
+- Copy lives in data: `src/content/platform.ts` and `src/content/solutions.ts`; the
+  homepage reuses their summaries. Each page is a stack of sections from
+  `src/components/sections/` (`Hero`, `FeatureScroll`, `FeatureChecklist`,
+  `FeatureOverview`, `CardGrid`, `Testimonial`, `LogoStrip`, `Faq`, `DemoCta`).
+- Header links can have a dropdown: add `children` to an item in `site.nav`.
+
+## Articles (blog)
+
+Articles, case studies and news live in `src/content/articles/` as Markdown, one file
+per entry, using an Astro content collection (`src/content.config.ts`). The file name
+becomes the URL: `src/content/articles/my-post.md` → `/articles/my-post`.
+
+```
+---
+title: How the Lakeshore Mariners filled the third homestand
+excerpt: One or two sentences, shown on cards and under the title.
+type: case-study          # article | case-study | news
+date: 2026-06-15
+image: /images/articles/lakeshore-mariners-third-homestand.webp
+kicker: Lakeshore Mariners · Baseball, summer league   # optional grey line
+minutes: 9                # optional, articles only
+client:                   # optional, case studies: side panel
+  name: Lakeshore Mariners
+  results:
+    - { figure: "+38%", label: Season tickets renewed }
+  products: [Ticketing, Fan CRM]
+---
+```
+
+- `/articles` lists everything with search, type filters (`?type=news`) and pages of 6,
+  all client-side; without JS every entry shows.
+- Article pages have a photo hero, the body, the client panel for case studies and a
+  "Keep reading" row with the three latest other entries.
+- Set `draft: true` to hide an entry.
 
 ## Layout API
 

@@ -1,16 +1,79 @@
 :root{
-  --bg: #fbfbf9;
-  --fg: #1a1a1a;
-  --muted: #5b5b5b;
-  --link: #0b3d91;
-  --border: rgba(0,0,0,.12);
-  --maxw: 900px;
-  --space-1: 8px;
-  --space-2: 12px;
-  --space-3: 16px;
-  --space-4: 24px;
-  --space-5: 32px;
+  /* Neutrals */
+  --d-black: #020202;
+  --d-ink: #020202;
+  --d-white: #fff;
+  --d-muted: #5c5c5c;
+  --d-inset: #f4f4f4;
+  --d-field: #e6e6e6;
+  --d-rule: #ececec;
+  --d-stage: #e6e6e6;
+  --d-body: #333;
+  --d-grey: #8a8a8a;
 
-  --font-sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  /* Tints (badges) */
+  --d-tint-blue-bg: #dbeafe;
+  --d-tint-blue-text: #1d4ed8;
+  --d-tint-violet-bg: #ede9fe;
+  --d-tint-violet-text: #6d28d9;
+  --d-tint-indigo-bg: #e0e7ff;
+  --d-tint-indigo-text: #4338ca;
+  --d-tint-cyan-bg: #cffafe;
+  --d-tint-cyan-text: #0e7490;
+
+  /* On black */
+  --d-black-card: #141414;
+  --d-black-tag: #262626;
+  --d-black-rule: #252525;
+  --d-black-edge: #2a2a2a;
+  --d-black-line: #2c2c2c;
+  --d-black-muted: #a8a8a8;
+  --d-black-soft: #e6e6e6;
+
+  /* Layout */
+  --d-max: 1280px;
+  --d-gutter: clamp(24px, 5.55vw, 80px);
+  --d-header: 84px;
+  --d-section: clamp(72px, 11.11vw, 160px);
+  --d-sheet-radius: 28px;
+  --d-sheet-lap: clamp(72px, 9.7vw, 140px);
+  --d-radius: 8px;
+  --d-radius-media: 12px;
+  --d-radius-card: 16px;
+
+  /* Type */
+  --font-sans: "Instrument Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --d-type-title: clamp(36px, 4.9vw, 72px);
+  --d-type-feature: clamp(30px, 3.05vw, 44px);
+  --d-type-display: min(64px, max(32px, 5.8vw, min(10vw, 47px)));
+  --d-type-heading: clamp(30px, 3.05vw, 44px);
+  --d-type-quote: clamp(26px, 2.8vw, 40px);
+  --d-type-lede: clamp(16px, 1.4vw, 20px);
+  --d-type-body: clamp(15px, 1.25vw, 18px);
+  --d-type-small: clamp(14px, 1.05vw, 15px);
+  --d-track-display: -.05em;
+  --d-track-heading: -.04em;
+
+  /* Motion */
+  --d-ease: cubic-bezier(.2, .7, .2, 1);
+  --d-duration: 320ms;
+
+  /* Ground-dependent (white sheet by default) */
+  --dc-text: var(--d-ink);
+  --dc-muted: var(--d-muted);
+  --dc-tag: var(--d-inset);
+  --dc-tag-text: var(--d-ink);
+  --dc-tile: var(--d-inset);
+  --dc-tile-media: var(--d-field);
+}
+
+/* Black bands flip the ground tokens */
+.on-black{
+  --dc-text: #fff;
+  --dc-muted: var(--d-black-muted);
+  --dc-tag: var(--d-black-tag);
+  --dc-tag-text: var(--d-black-soft);
+  --dc-tile: var(--d-black-card);
+  --dc-tile-media: var(--d-black-tag);
 }

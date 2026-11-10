@@ -1,0 +1,116 @@
+---
+/**
+ * "Book a demo" block: copy on the left, form card on the right.
+ * The form opens a pre-filled email by default; pass `action` to post to a form handler.
+ */
+import { site } from "../../content/site";
+
+const {
+  eyebrow = "Book a demo",
+  heading = "See Stadli in action.",
+  lede = "Tell us about your organization and we’ll walk you through ticketing, CRM, marketing and AI in a personalized demo.",
+  action,
+  headingTag = "h2"
+} = Astro.props as {
+  eyebrow?: string;
+  heading?: string;
+  lede?: string;
+  action?: string;
+  headingTag?: "h1" | "h2";
+};
+const Heading = headingTag;
+---
+
+<section class="cta">
+  <div class="cta__copy">
+    <span class="d-eyebrow">{eyebrow}</span>
+    <Heading class="d-heading cta__heading">{heading}</Heading>
+    <p class="d-lede cta__lede">{lede}</p>
+  </div>
+
+  <div class="cta__card">
+    <form
+      class="cta__form"
+      method="post"
+      action={action ?? `mailto:${site.author.email}`}
+      enctype={action ? undefined : "text/plain"}
+    >
+      <div class="cta__pair">
+        <label class="d-label">First name
+          <input class="d-field" name="first_name" autocomplete="given-name" required />
+        </label>
+        <label class="d-label">Last name
+          <input class="d-field" name="last_name" autocomplete="family-name" required />
+        </label>
+      </div>
+      <div class="cta__pair">
+        <label class="d-label">Work email
+          <input class="d-field" type="email" name="email" autocomplete="email" placeholder="you@team.com" required />
+        </label>
+        <label class="d-label">Organization
+          <input class="d-field" name="organization" autocomplete="organization" required />
+        </label>
+      </div>
+      <div class="cta__pair">
+        <label class="d-label">Organization type
+          <select class="d-field" name="organization_type" required>
+            <option value="" selected disabled>Select one</option>
+            <option>Pro team</option>
+            <option>Minor league</option>
+            <option>College</option>
+            <option>Venue</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label class="d-label">Role
+          <input class="d-field" name="role" autocomplete="organization-title" required />
+        </label>
+      </div>
+      <label class="d-label">What would you like to see? <span class="cta__optional">(optional)</span>
+        <textarea class="d-field cta__message" name="message" rows="3"></textarea>
+      </label>
+      <div class="cta__submit-row">
+        <span class="cta__note">All fields required unless marked optional.</span>
+        <button class="d-btn" type="submit">Book a demo</button>
+      </div>
+    </form>
+  </div>
+
+</section>
+
+<style>
+  .cta{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 28px clamp(32px, 5vw, 80px);
+    color: var(--dc-text);
+  }
+  .cta__copy{ display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .cta__copy .d-eyebrow{ margin-bottom: -8px; }
+  .cta__heading{ max-width: 570px; }
+  .cta__lede{ max-width: 440px; text-wrap: balance; }
+
+  .cta__card{
+    padding: 32px;
+    border-radius: var(--d-radius-media);
+    background: #fff;
+    color: var(--d-ink);
+  }
+  .cta__form{ display: flex; flex-direction: column; gap: 20px; }
+  .cta__title{ margin-top: 8px; font-size: 20px; font-weight: 500; letter-spacing: -.025em; line-height: 1.2; }
+  .cta__pair{ display: flex; flex-wrap: wrap; gap: 16px; }
+  .cta__pair > .d-label{ flex: 1 1 160px; }
+  .cta__form .d-btn{ font-size: 14px; }
+  .cta__optional{ color: var(--d-muted); font-weight: 400; }
+  .cta__message{ height: auto; min-height: 96px; padding-block: 10px; resize: vertical; line-height: 1.45; }
+  .cta__submit-row{ display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 24px; margin-top: 4px; }
+  .cta__note{ color: var(--d-muted); font-size: 13px; }
+
+
+  @media (max-width: 900px){
+    .cta{ grid-template-columns: minmax(0, 1fr); row-gap: 32px; }
+    .cta__heading{ font-size: var(--d-type-display); line-height: .98; }
+    .cta__card{ padding: 24px; }
+  }
+</style>
