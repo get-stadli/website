@@ -5,17 +5,18 @@
  * Without JS the panels simply stack, each with its own copy.
  */
 import ProductMock from "./ProductMock.astro";
+import type { MockKind } from "./mocks";
 
 type Item = {
   title: string;
   text: string;
   link?: { label: string; href: string };
-  mock: "shop" | "audience" | "message" | "chart";
+  mock: MockKind;
 };
 
 const { badge, heading, headingGrey, lede, items } = Astro.props as {
   badge?: string;
-  heading: string;
+  heading?: string;
   headingGrey?: string;
   lede?: string;
   items: Item[];
@@ -26,6 +27,7 @@ const count = (i: number) => `${String(i + 1).padStart(2, "0")} / ${total}`;
 ---
 
 <section class="fscroll" data-fscroll>
+  {heading && (
   <div class="fscroll__lead">
     {badge && <span class="d-badge">{badge}</span>}
     <h2 class="d-quote fscroll__heading">
@@ -34,6 +36,7 @@ const count = (i: number) => `${String(i + 1).padStart(2, "0")} / ${total}`;
     </h2>
     {lede && <p class="d-text">{lede}</p>}
   </div>
+  )}
 
   <div class="fscroll__body">
     <div class="fscroll__side" aria-hidden="true">
@@ -169,7 +172,7 @@ const count = (i: number) => `${String(i + 1).padStart(2, "0")} / ${total}`;
     :global(.js) .fscroll__stage{ width: min(100%, calc(var(--fs-view) - 80px)); }
   }
 
-  .fscroll__list{ display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+  .fscroll__list{ display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
   .fscroll__name{
     display: block;
     width: 100%;
@@ -177,9 +180,9 @@ const count = (i: number) => `${String(i + 1).padStart(2, "0")} / ${total}`;
     border: 0;
     background: none;
     color: var(--d-ink);
-    font-size: var(--d-type-quote);
+    font-size: clamp(24px, 2.3vw, 34px);
     font-weight: 500;
-    line-height: 1.25;
+    line-height: 1.15;
     letter-spacing: var(--d-track-heading);
     text-align: left;
     cursor: pointer;

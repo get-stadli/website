@@ -2,19 +2,12 @@
 import { site } from "../content/site";
 
 const year = new Date().getFullYear();
-const { columns, about, languages } = site.footer;
+const { columns, languages } = site.footer;
 ---
 
 <footer class="site-footer">
   <div class="d-wrap site-footer__inner">
     <div class="site-footer__top">
-      <div class="site-footer__brand">
-        <a class="site-logo" href="/" aria-label={`${site.name} home`}>
-          <img src="/images/brand/stadli-white.png" alt={site.name} width="101" height="30" />
-        </a>
-        <p class="site-footer__tagline">{site.description}</p>
-      </div>
-
       {columns.map((col) => (
         <nav class="site-footer__col" aria-label={col.title}>
           <h2 class="site-footer__title">{col.title}</h2>
@@ -25,17 +18,14 @@ const { columns, about, languages } = site.footer;
           ))}
         </nav>
       ))}
-
-      <div class="site-footer__col site-footer__col--wide">
-        <h2 class="site-footer__title">About</h2>
-        <p class="site-footer__about">{about}</p>
-      </div>
     </div>
 
     <div class="site-footer__bottom">
-      <div class="site-footer__legal">
-        <span>© {year} {site.author.name}</span>
-        {site.author.email && <a href={`mailto:${site.author.email}`}>{site.author.email}</a>}
+      <div class="site-footer__brand">
+        <a class="site-logo" href="/" aria-label={`${site.name} home`}>
+          <img src="/images/brand/stadli-white.png" alt={site.name} width="101" height="30" />
+        </a>
+        <span class="site-footer__legal">© {year} {site.name}. All rights reserved.</span>
       </div>
       <nav class="site-lang" aria-label="Language">
         {languages.map((lang) => (

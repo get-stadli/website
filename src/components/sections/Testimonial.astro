@@ -1,0 +1,98 @@
+---
+/**
+ * Customer quote with a photo, the person, a few result figures and a link.
+ * Sits on a black band.
+ */
+const { image, imageAlt = "", quote, name, team, avatar, stats = [], link } = Astro.props as {
+  image: string;
+  imageAlt?: string;
+  quote: string;
+  name: string;
+  team: string;
+  avatar?: string;
+  stats?: { label: string; value: string }[];
+  link?: { label: string; href: string };
+};
+---
+
+<figure class="quote">
+  <div class="quote__photo">
+    <img src={image} alt={imageAlt} loading="lazy" decoding="async" width="960" height="1200" />
+  </div>
+
+  <div class="quote__body">
+    <blockquote class="quote__text">“{quote}”</blockquote>
+
+    <figcaption class="quote__who">
+      {avatar && <span class="quote__avatar"><img src={avatar} alt="" loading="lazy" decoding="async" /></span>}
+      <span><b>{name}</b><br /><span class="quote__team">{team}</span></span>
+    </figcaption>
+
+    {stats.length > 0 && (
+      <dl class="quote__stats">
+        {stats.map((stat) => (
+          <div>
+            <dt>{stat.label}</dt>
+            <dd>{stat.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+
+    {link && <a class="d-arrow" href={link.href}>{link.label}</a>}
+  </div>
+</figure>
+
+<style>
+  .quote{
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    gap: clamp(40px, 6vw, 96px);
+    margin: 0;
+    color: var(--dc-text);
+  }
+  .quote__photo{ aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--d-radius-media); background: var(--dc-tile-media); }
+  .quote__photo img{ width: 100%; max-width: none; height: 100%; object-fit: cover; }
+  .quote__body{ display: flex; flex-direction: column; align-items: flex-start; gap: 32px; }
+  .quote__text{
+    margin: 0;
+    font-size: var(--d-type-quote);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: var(--d-track-heading);
+    text-wrap: pretty;
+  }
+  .quote__who{ display: flex; align-items: center; gap: 14px; font-size: 15px; line-height: 1.35; }
+  .quote__who b{ font-weight: 500; }
+  .quote__team{ color: var(--dc-muted); }
+  .quote__avatar{
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 52px;
+    height: 52px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .quote__avatar img{ width: 78%; height: 78%; object-fit: contain; }
+  .quote__stats{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 56px;
+    width: 100%;
+    margin: 0;
+    padding-top: 28px;
+    border-top: 1px solid var(--d-black-line);
+  }
+  .quote__stats div{ display: flex; flex-direction: column-reverse; gap: 6px; }
+  .quote__stats dt{ color: var(--dc-muted); font-size: 14px; }
+  .quote__stats dd{ margin: 0; font-size: clamp(32px, 2.8vw, 40px); font-weight: 500; line-height: 1; letter-spacing: -.045em; }
+  .quote .d-arrow{ color: var(--dc-text); }
+
+  @media (max-width: 800px){
+    .quote{ grid-template-columns: minmax(0, 1fr); }
+    .quote__photo{ aspect-ratio: 4 / 3; }
+  }
+</style>

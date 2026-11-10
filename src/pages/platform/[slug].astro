@@ -1,0 +1,42 @@
+---
+import Base from "../../layouts/Base.astro";
+import Hero from "../../components/sections/Hero.astro";
+import FeatureScroll from "../../components/sections/FeatureScroll.astro";
+import FeatureChecklist from "../../components/sections/FeatureChecklist.astro";
+import DemoCta from "../../components/sections/DemoCta.astro";
+import { platformPages, type PlatformPage } from "../../content/platform";
+import { site } from "../../content/site";
+
+export function getStaticPaths() {
+  return platformPages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: PlatformPage };
+---
+
+<Base title={`${page.name} — ${site.name}`} description={page.summary} canonicalPath={`/platform/${page.slug}`}>
+  <Hero
+    title={page.name}
+    lede={page.lede}
+    image={page.image}
+    primary={page.heroCta ? { label: site.cta.label, href: "#demo" } : undefined}
+  />
+
+  <div class="d-sheet d-sheet--lap">
+    <div class="d-wrap platform-stack">
+      <FeatureScroll items={page.rows} />
+      <FeatureChecklist groups={page.groups} />
+    </div>
+    <div class="d-sheet-corners" aria-hidden="true"></div>
+  </div>
+
+  <div class="on-black">
+    <div class="d-band" id="demo">
+      <div class="d-wrap"><DemoCta /></div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .platform-stack{ display: flex; flex-direction: column; gap: var(--d-section); }
+</style>

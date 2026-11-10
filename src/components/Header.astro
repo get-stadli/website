@@ -6,8 +6,14 @@ const { nav = site.nav, cta = site.cta } = Astro.props as {
   cta?: SiteNavItem;
 };
 
-const path = Astro.url.pathname;
-const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const clean = (href: string) => href.split(/[?#]/)[0].replace(/\/$/, "") || "/";
+const matches = (href: string) => {
+  const target = clean(href);
+  return target === "/" ? path === "/" : path === target || path.startsWith(`${target}/`);
+};
+const isActive = (item: SiteNavItem) =>
+  item.children?.length ? item.children.some((child) => matches(child.href)) : matches(item.href);
 ---
 
 <header class="site-header" data-header>
@@ -16,9 +22,18 @@ const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWit
       <summary aria-label="Menu"><span class="site-menu__icon" aria-hidden="true"></span></summary>
       <div class="site-drawer">
         <nav class="d-wrap site-drawer__list" aria-label="Mobile">
-          {nav.map((item) => (
-            <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>{item.label}</a>
-          ))}
+          {nav.map((item) =>
+            item.children?.length ? (
+              <div class="site-drawer__group">
+                <p class="site-drawer__title">{item.label}</p>
+                {item.children.map((child) => (
+                  <a href={child.href} aria-current={matches(child.href) ? "page" : undefined}>{child.label}</a>
+                ))}
+              </div>
+            ) : (
+              <a class="site-drawer__top" href={item.href} aria-current={isActive(item) ? "page" : undefined}>{item.label}</a>
+            )
+          )}
         </nav>
         <div class="d-wrap">
           <a class="d-btn d-btn--light" href={cta.href}>{cta.label}</a>
@@ -31,9 +46,28 @@ const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWit
     </a>
 
     <nav class="site-nav" aria-label="Primary">
-      {nav.map((item) => (
-        <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>{item.label}</a>
-      ))}
+      {nav.map((item) =>
+        item.children?.length ? (
+          <div class="site-nav__item">
+            <a class="site-nav__link" href={item.href} aria-current={isActive(item) ? "page" : undefined}>
+              {item.label}
+            </a>
+            <div class="site-nav__panel">
+              <ul>
+                {item.children.map((child) => (
+                  <li>
+                    <a href={child.href} aria-current={matches(child.href) ? "page" : undefined}>{child.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <a class="site-nav__link" href={item.href} aria-current={isActive(item) ? "page" : undefined}>
+            {item.label}
+          </a>
+        )
+      )}
     </nav>
 
     <a class="d-arrow site-demo" href={cta.href}>

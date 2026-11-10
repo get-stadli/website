@@ -1,16 +1,21 @@
 ---
 /**
- * Full-bleed video hero under the transparent header.
+ * Full-bleed hero under the transparent header: a looping video, or a photo
+ * when `image` is given.
  * Follow it with a `.d-sheet.d-sheet--lap` to get the overlapping white sheet.
  */
 const {
   title,
+  lede,
+  image,
   video = "/video/hero.mp4",
   poster = "/video/hero-poster.jpg",
   primary,
   secondary
 } = Astro.props as {
   title: string;
+  lede?: string;
+  image?: string;
   video?: string;
   poster?: string;
   primary?: { label: string; href: string };
@@ -18,13 +23,18 @@ const {
 };
 ---
 
-<section class="hero">
+<section class={`hero ${image ? "hero--photo" : ""}`}>
   <div class="hero__stage" aria-hidden="true">
-    <video class="hero__media" src={video} poster={poster} autoplay muted loop playsinline preload="metadata"></video>
+    {image ? (
+      <img class="hero__media" src={image} alt="" width="1600" height="1200" />
+    ) : (
+      <video class="hero__media hero__media--video" src={video} poster={poster} autoplay muted loop playsinline preload="metadata"></video>
+    )}
   </div>
 
   <div class="d-wrap hero__copy">
     <h1 class="d-display hero__heading">{title}</h1>
+    {lede && <p class="d-lede hero__lede">{lede}</p>}
     {(primary || secondary) && (
       <div class="hero__actions">
         {primary && <a class="d-btn d-btn--light" href={primary.href}>{primary.label}</a>}
@@ -50,6 +60,11 @@ const {
     inset: 0;
     background: linear-gradient(to bottom, #0202024d 0%, #0202024d 62%, var(--d-black) 100%);
   }
+  .hero--photo .hero__stage::after{
+    background:
+      linear-gradient(to right, #020202b3 0%, #02020266 45%, #02020200 75%),
+      linear-gradient(to bottom, #02020266 0%, #0202024d 62%, var(--d-black) 100%);
+  }
   .hero__media{ width: 100%; max-width: none; height: 100%; object-fit: cover; }
   .hero__copy{
     display: flex;
@@ -60,11 +75,12 @@ const {
     padding-bottom: calc(var(--d-sheet-lap) + clamp(90px, 8vw, 120px));
   }
   .hero__heading{ max-width: 11em; margin-bottom: calc(-1 * clamp(12px, 1.1vw, 14px)); }
+  .hero__lede{ max-width: 36em; margin-top: 4px; color: #ffffffd9; text-wrap: pretty; }
   .hero__actions{ display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
   .hero__actions .d-arrow{ color: #fff; }
 
   @media (prefers-reduced-motion: reduce){
-    .hero__media{ display: none; }
+    .hero__media--video{ display: none; }
     .hero__stage{ background: center / cover url("/video/hero-poster.jpg"); }
   }
 </style>

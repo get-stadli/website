@@ -3,9 +3,14 @@ import Base from "../layouts/Base.astro";
 import Hero from "../components/sections/Hero.astro";
 import FeatureScroll from "../components/sections/FeatureScroll.astro";
 import CardGrid from "../components/sections/CardGrid.astro";
+import Testimonial from "../components/sections/Testimonial.astro";
 import LogoStrip from "../components/sections/LogoStrip.astro";
+import Faq from "../components/sections/Faq.astro";
 import DemoCta from "../components/sections/DemoCta.astro";
+import { platformPages } from "../content/platform";
+import { solutionPages } from "../content/solutions";
 import { site } from "../content/site";
+import type { MockKind } from "../components/sections/mocks";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -15,51 +20,70 @@ const jsonLd = {
   inLanguage: site.locale
 };
 
-const features = [
-  {
-    title: "Sell everything",
-    text: "Tickets, merch, food and parking in one checkout, so every fan spends less time in line and more time in the stands.",
-    link: { label: "Learn more", href: "/about" },
-    mock: "shop" as const
-  },
-  {
-    title: "Know your fans",
-    text: "Every purchase builds a single fan profile. Segment by games attended, spend or seat, in a few clicks.",
-    link: { label: "Learn more", href: "/about" },
-    mock: "audience" as const
-  },
-  {
-    title: "Bring them back",
-    text: "Send the right SMS or email to the right fans, at the moment they’re most likely to come back.",
-    link: { label: "Learn more", href: "/about" },
-    mock: "message" as const
-  },
-  {
-    title: "See what works",
-    text: "Live sales and attendance for every event, compared to last season, without exporting a single spreadsheet.",
-    link: { label: "Learn more", href: "/about" },
-    mock: "chart" as const
-  }
-];
+const moduleMocks: Record<string, MockKind> = {
+  "ticketing-commerce": "shop",
+  "fan-crm": "audience",
+  "marketing-tools": "message",
+  "intelligence-ai": "chart"
+};
 
-const cards = [
-  {
-    image: "/images/photos/card1.webp",
-    title: "For fans.",
-    text: "A checkout that feels like the game: fast, simple and on their phone.",
-    link: { label: "Fan experience", href: "/about" }
-  },
+const modules = platformPages.map((page) => ({
+  title: page.name,
+  text: page.summary,
+  mock: moduleMocks[page.slug] ?? "chart",
+  link: { label: "Learn more", href: `/platform/${page.slug}` }
+}));
+
+const solutionImages: Record<string, string> = {
+  "sport-teams": "/images/articles/quebec-capitales-choose-stadli.webp",
+  "live-events": "/images/articles/end-of-season-report.webp"
+};
+
+const solutions = solutionPages.map((page) => ({
+  image: solutionImages[page.slug] ?? page.image,
+  title: page.name,
+  text: page.summary,
+  link: { label: "Learn more", href: `/solutions/${page.slug}` }
+}));
+
+const onboarding = [
   {
     image: "/images/photos/card2.webp",
-    title: "For staff.",
-    text: "Scanning, sales and reporting that your whole team can run on game night.",
-    link: { label: "Operations", href: "/about" }
+    title: "Import & migration",
+    text: "We move your contacts, orders, season passes and marketing consent from your current system. You can switch mid-season or in the off-season without losing any data."
   },
   {
     image: "/images/photos/card3.webp",
-    title: "For the front office.",
-    text: "Fan data and marketing that turn one-time buyers into season regulars.",
-    link: { label: "Growth", href: "/about" }
+    title: "Website & seating charts",
+    text: "We design your branded storefront and build interactive seating charts for your venue. You’re ready to sell on day one."
+  },
+  {
+    image: "/images/photos/card1.webp",
+    title: "Launch, training & support",
+    text: "We plan your launch with you, train your staff from the box office to the gate, and stay available after go-live. You’ll also get help with anything else you need along the way."
+  }
+];
+
+const faq = [
+  {
+    question: "Can you move us from our current platform?",
+    answer: "Yes. We bring over your events, seat maps and fan lists, and train your staff before your first game on Stadli."
+  },
+  {
+    question: "How long does it take to get set up?",
+    answer: "Most teams sell their first tickets within a few weeks. We set the timeline with you around your season."
+  },
+  {
+    question: "How are payments handled?",
+    answer: "Every order runs through Stripe, so fans check out securely and your team never stores a card number."
+  },
+  {
+    question: "What happens if something goes wrong on game day?",
+    answer: "Real people are on call from doors open to the final whistle, and they know what’s at stake on a sold-out night."
+  },
+  {
+    question: "Does Stadli work with the tools we already use?",
+    answer: "Yes. Stadli connects to your existing tools, so sales and fan data reach the places your team already works."
   }
 ];
 ---
@@ -67,19 +91,18 @@ const cards = [
 <Base title={site.name} description={site.description} canonicalPath="/" jsonLd={jsonLd}>
   <Hero
     title={site.tagline}
-    primary={{ label: "Get a demo", href: site.cta.href }}
-    secondary={{ label: "Learn more", href: "#platform" }}
+    lede="Stadli is the all-in-one platform for sports teams and live events to manage the complete fan experience, from first ticket purchase to lifelong loyalty."
+    primary={{ label: site.cta.label, href: "#demo" }}
   />
 
   <div class="d-sheet d-sheet--lap" id="platform">
-    <div class="d-wrap">
+    <div class="d-wrap home-stack">
       <FeatureScroll
-        badge="Platform"
-        heading="One platform for every event."
-        headingGrey="From the first ticket to the last out."
-        lede="Ticketing, fan data and marketing that work together."
-        items={features}
+        heading="Explore what’s built into Stadli."
+        lede="50 of the 300+ things Stadli does today, all behind one login."
+        items={modules}
       />
+      <CardGrid cards={solutions} stacked />
     </div>
     <div class="d-sheet-corners" aria-hidden="true"></div>
   </div>
@@ -88,23 +111,57 @@ const cards = [
     <div class="d-band">
       <div class="d-wrap">
         <CardGrid
-          heading="Built for game night"
-          lede="Everyone who makes the event happen, on the same platform."
-          cards={cards}
+          heading="Done-for-you onboarding"
+          lede="Every team that signs with Stadli gets a dedicated onboarding crew, at no extra cost. We set everything up, bring your history over, and stay with you through opening night and after."
+          cards={onboarding}
+          stacked
         />
       </div>
     </div>
 
     <div class="d-band">
       <div class="d-wrap">
-        <LogoStrip caption="Trusted by clubs across Québec and Ontario" />
+        <Testimonial
+          image="/images/articles/armada-adopts-stadli.webp"
+          quote="Migrating in the middle of the season seemed impossible. Stadli made it easy and supported us every step of the way."
+          name="Guy St-Gelais"
+          team="Voyageurs de Jonquière"
+          avatar="/images/clubs/voyageurs.webp"
+          stats={[
+            { label: "Season tickets sold", value: "+38%" },
+            { label: "Time to sell out", value: "4 hours" }
+          ]}
+          link={{ label: "Read the story", href: "/articles?type=case-study" }}
+        />
       </div>
     </div>
 
     <div class="d-band">
       <div class="d-wrap">
-        <DemoCta />
+        <LogoStrip caption="Trusted by teams across North America" />
       </div>
     </div>
   </div>
+
+  <div class="d-sheet">
+    <div class="d-wrap">
+      <Faq
+        heading="Questions, answered."
+        lede="Everything teams ask before switching to Stadli. Don’t see yours? Our team is one message away."
+        link={{ label: "Talk to our team", href: "/contact" }}
+        items={faq}
+      />
+    </div>
+    <div class="d-sheet-corners" aria-hidden="true"></div>
+  </div>
+
+  <div class="on-black">
+    <div class="d-band" id="demo">
+      <div class="d-wrap"><DemoCta /></div>
+    </div>
+  </div>
 </Base>
+
+<style>
+  .home-stack{ display: flex; flex-direction: column; gap: var(--d-section); }
+</style>

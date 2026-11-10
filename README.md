@@ -118,6 +118,16 @@ Used consistently across:
 
 No duplication.
 
+## Marketing pages
+
+- `/` homepage, `/platform/<slug>` (Ticketing & Commerce, Fan CRM, Marketing Tools,
+  Intelligence & AI) and `/solutions/<slug>` (Sport Teams, Live Events).
+- Copy lives in data: `src/content/platform.ts` and `src/content/solutions.ts`; the
+  homepage reuses their summaries. Each page is a stack of sections from
+  `src/components/sections/` (`Hero`, `FeatureScroll`, `FeatureChecklist`,
+  `FeatureOverview`, `CardGrid`, `Testimonial`, `LogoStrip`, `Faq`, `DemoCta`).
+- Header links can have a dropdown: add `children` to an item in `site.nav`.
+
 ## Articles (blog)
 
 Articles, case studies and news live in `src/content/articles/` as Markdown, one file

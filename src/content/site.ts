@@ -2,6 +2,8 @@
 export type SiteNavItem = {
   label: string;
   href: string;
+  /** Optional dropdown under a header link */
+  children?: SiteNavItem[];
 };
 
 export type FooterColumn = {
@@ -54,10 +56,33 @@ export const site: SiteConfig = {
     }
   },
   nav: [
-    { label: "Platform", href: "/" },
-    { label: "About", href: "/about" },
-    { label: "Articles", href: "/articles" },
-    { label: "Contact", href: "/contact" }
+    {
+      label: "Platform",
+      href: "/#platform",
+      children: [
+        { label: "Ticketing & Commerce", href: "/platform/ticketing-commerce" },
+        { label: "Fan CRM", href: "/platform/fan-crm" },
+        { label: "Marketing Tools", href: "/platform/marketing-tools" },
+        { label: "Intelligence & AI", href: "/platform/intelligence-ai" }
+      ]
+    },
+    {
+      label: "Solutions",
+      href: "/solutions/sport-teams",
+      children: [
+        { label: "Stadli for Sport Teams", href: "/solutions/sport-teams" },
+        { label: "Stadli for Live Events", href: "/solutions/live-events" }
+      ]
+    },
+    { label: "Resources", href: "/articles" },
+    {
+      label: "Company",
+      href: "/about",
+      children: [
+        { label: "About", href: "/about" },
+        { label: "Contact", href: "/contact" }
+      ]
+    }
   ],
   cta: { label: "Book a demo", href: "/contact" },
   footer: {
@@ -65,22 +90,39 @@ export const site: SiteConfig = {
       "Ticketing, audience data and marketing for the people who bring people together.",
     columns: [
       {
-        title: "Navigate",
+        title: "Platform",
         links: [
-          { label: "Home", href: "/" },
-          { label: "About", href: "/about" },
-          { label: "Articles", href: "/articles" },
-          { label: "Contact", href: "/contact" },
-          { label: "Legal", href: "/legal" }
+          { label: "Ticketing & Commerce", href: "/platform/ticketing-commerce" },
+          { label: "Fan CRM", href: "/platform/fan-crm" },
+          { label: "Marketing Tools", href: "/platform/marketing-tools" },
+          { label: "Intelligence & AI", href: "/platform/intelligence-ai" }
         ]
       },
       {
-        title: "Follow",
+        title: "Solutions",
         links: [
-          { label: "Case studies", href: "/articles?type=case-study" },
-          { label: "News", href: "/articles?type=news" },
-          { label: "LinkedIn", href: "https://www.linkedin.com/" }
+          { label: "Sport teams", href: "/solutions/sport-teams" },
+          { label: "Live events", href: "/solutions/live-events" }
         ]
+      },
+      {
+        title: "Resources",
+        links: [
+          { label: "Blog", href: "/articles" },
+          { label: "Case studies", href: "/articles?type=case-study" },
+          { label: "News", href: "/articles?type=news" }
+        ]
+      },
+      {
+        title: "Company",
+        links: [
+          { label: "About", href: "/about" },
+          { label: "Contact", href: "/contact" }
+        ]
+      },
+      {
+        title: "Legal",
+        links: [{ label: "Legal notice", href: "/legal" }]
       }
     ],
     languages: [
